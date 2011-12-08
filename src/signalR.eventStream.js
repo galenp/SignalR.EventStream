@@ -15,7 +15,17 @@ function EventStream() {
             };
 
             $.connection.hub.start({}, function () {
-                stream.authorize();
+                stream.authorize()
+                    .fail(function (e) {
+                        $.connection.hub.stop();
+                        parent.connectionFailed(e);
+                    })
+                    .done(function (success) {
+                        if (success === false) {
+                            $.connection.hub.stop();
+                            parent.connectionFailed("unauthorized");
+                        }
+                    });
             });
 
             this.initialized = true;
@@ -26,5 +36,9 @@ function EventStream() {
 
     this.eventReceived = function (data, template) {
         $("body").append(template);
+    };
+
+    this.connectionFailed = function (e) {
+        alert('unable to connect to event stream.\r\nError:' + e);
     };
 };

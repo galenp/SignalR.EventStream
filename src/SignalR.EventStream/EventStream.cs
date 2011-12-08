@@ -40,7 +40,7 @@ namespace SignalR
         public bool Authorize()
         {
             //validate user id
-            string id = Context.ClientId == "null" ? null : Context.ClientId;
+        string id = Context.ClientId == "null" ? null : Context.ClientId;
 
             if (id != null) {
                 AddToGroup("authorized");
