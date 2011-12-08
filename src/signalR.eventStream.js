@@ -23,7 +23,7 @@ function EventStream() {
                     .done(function (success) {
                         if (success === false) {
                             $.connection.hub.stop();
-                            parent.connectionFailed("unauthorized");
+                            parent.unauthorized();
                         }
                     });
             });
@@ -40,5 +40,9 @@ function EventStream() {
 
     this.connectionFailed = function (e) {
         alert('unable to connect to event stream.\r\nError:' + e);
+    };
+
+    this.unauthorized = function (e) {
+
     };
 };
