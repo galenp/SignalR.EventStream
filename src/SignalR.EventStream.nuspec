@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>SignalR.EventStream</id>
-    <version>1.0</version>
+    <version>1.0.0.1</version>
     <title>SignalR.EventStream</title>
     <authors>Ben Dornis</authors>
     <owners />
@@ -12,7 +12,7 @@
     <tags>signalr</tags>
     <dependencies>
       <dependency id="SignalR" version="0.3.5" />
-      <dependency id="Newtonsoft.Json" version="4.0.4" />
+      <dependency id="Newtonsoft.Json" version="4.0.2" />
       <dependency id="WebActivator" version="1.5" />
     </dependencies>
   </metadata>

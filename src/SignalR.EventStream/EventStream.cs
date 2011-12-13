@@ -37,6 +37,37 @@ namespace SignalR
             Send(type, @event);
         }
 
+        public void SendToSelf(string @event)
+        {
+            SendToSelf("event", @event);
+        }
+
+        public void SendToSelf(string type, object @event)
+        {
+            Caller
+                .receiveEvent(JsonConvert.SerializeObject(
+                    new {
+                        Type = type,
+                        Event = @event
+                    }));
+        }
+
+        public void SendToSelf(object @event)
+        {
+            if (Utilities.IsAnonymousType(@event.GetType())) {
+                throw new InvalidOperationException(
+                    "Anonymous types are not supported. Use Send(string, object) instead.");
+            }
+
+            string type = @event.GetType().Name;
+            SendToSelf(type, @event);
+        }
+
+        public void RaiseEvent(string data)
+        {
+            Send(data);
+        }
+
         public bool Authorize()
         {
             //validate user id
