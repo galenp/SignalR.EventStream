@@ -1,4 +1,8 @@
-function EventStream() {
+function PageStream() {
+    return new EventStream(window.location.pathname);
+}
+function EventStream(authorizeFor) {
+    this.authorizeFor = authorizeFor;
     this.initialized = false;
     this.connect = function () {
         if (!this.initialized) {
@@ -6,16 +10,11 @@ function EventStream() {
             var parent = this;
             stream.receiveEvent = function (event) {
                 var result = $.parseJSON(event);
-                var template = $("#eventStream-template-" + result.Type);
-                if (template && template.tmpl) {
-                    parent.eventReceived(result, template.tmpl(result.Type == "event" ? result : result.Event));
-                } else {
-                    parent.eventReceived(result);
-                }
+                parent.eventReceived(result.Type, result.Event);
             };
 
             $.connection.hub.start({}, function () {
-                stream.authorize()
+                stream.authorize(parent.authorizeFor)
                     .fail(function (e) {
                         $.connection.hub.stop();
                         parent.connectionFailed(e);
