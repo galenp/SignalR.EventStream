@@ -20,12 +20,9 @@ function EventStream(authorizeFor) {
                         parent.connectionFailed(e);
                     })
                     .done(function (success) {
-                        if (success.Result !== false) {
+                        if (success !== true) {
                             $.connection.hub.stop();
                             parent.unauthorized();
-                        } else {
-                            //new connectionId
-                            $.connection.hub.clientId = success.ClientId;
                         }
                     });
             });
@@ -36,8 +33,7 @@ function EventStream(authorizeFor) {
         return this;
     };
 
-    this.eventReceived = function (data, template) {
-        $("body").append(template);
+    this.eventReceived = function (type, data) {
     };
 
     this.connectionFailed = function (e) {

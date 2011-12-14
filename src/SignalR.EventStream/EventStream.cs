@@ -41,9 +41,17 @@ namespace SignalR
 
         public void RemoveUser(string clientId)
         {
-            List<string> value = null;
-            if (!Users.TryRemove(clientId, out value)) {
-                throw new InvalidOperationException("Unable to remove user: " + clientId);
+            lock (locker) {
+                foreach (var user in Users) {
+                    if (user.Value.Contains(clientId)) {
+                        user.Value.Remove(clientId);
+                        if (user.Value.Count == 0) {
+                            List<string> values;
+                            Users.TryRemove(user.Key, out values);
+                        }
+                        break;
+                    }
+                }
             }
         }
     }
