@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -9,8 +10,52 @@ using SignalR.Hubs;
 
 namespace SignalR
 {
-    public class EventStream : Hub, IEventStream
+    internal class EventStreamConnectionManager
     {
+        public ConcurrentDictionary<string, List<string>> Users { get; set; }
+        private static object locker = new object();
+
+        public EventStreamConnectionManager()
+        {
+            Users = new ConcurrentDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        public void AddConnection(string clientId, string userId)
+        {
+            lock (locker) {
+                if (!Users.ContainsKey(userId)) {
+                    Users[userId] = new List<string>() { clientId };
+                } else {
+                    Users[userId].Add(clientId);
+                }
+            }
+        }
+
+        public IEnumerable<string> GetConnection(string userId)
+        {
+            if (Users.ContainsKey(userId))
+                return Users[userId];
+
+            return null;
+        }
+
+        public void RemoveUser(string clientId)
+        {
+            List<string> value = null;
+            if (!Users.TryRemove(clientId, out value)) {
+                throw new InvalidOperationException("Unable to remove user: " + clientId);
+            }
+        }
+    }
+
+    public class EventStream : Hub, IEventStream, IDisconnect
+    {
+        private static readonly EventStreamConnectionManager ConnectionManager;
+        static EventStream()
+        {
+            ConnectionManager = new EventStreamConnectionManager();
+        }
+
         #region " Send "
         public void Send(string @event)
         {
@@ -19,7 +64,7 @@ namespace SignalR
 
         public void Send(string type, object @event)
         {
-            SendToTarget("authorized", type, @event);
+            SendTo("authorized", type, @event);
         }
 
         public void Send(object @event)
@@ -34,22 +79,31 @@ namespace SignalR
         }
         #endregion
         #region " SendToTarget "
-        public void SendToTarget(string target, string type, object @event)
+        public void SendTo(string target, string type, object @event)
         {
-            GetClients<EventStream>()[target]
-                .receiveEvent(JsonConvert.SerializeObject(
-                    new {
-                        Type = type,
-                        Event = @event
-                    }));
+            //find the target
+            var destinations = ConnectionManager.GetConnection(target);
+            if (destinations != null) {
+            } else {
+                destinations = new[] {target};
+            }
+
+            foreach (var destination in destinations) {
+                GetClients<EventStream>()[destination]
+                    .receiveEvent(JsonConvert.SerializeObject(
+                        new {
+                            Type = type,
+                            Event = @event
+                        }));
+            }
         }
 
-        public void SendToTarget(string target, string @event)
+        public void SendTo(string target, string @event)
         {
-            SendToTarget(target, "event", @event);
+            SendTo(target, "event", @event);
         }
 
-        public void SendToTarget(string target, object @event)
+        public void SendTo(string target, object @event)
         {
             if (Utilities.IsAnonymousType(@event.GetType())) {
                 throw new InvalidOperationException(
@@ -57,34 +111,7 @@ namespace SignalR
             }
 
             string type = @event.GetType().Name;
-            SendToTarget(target, type, @event);
-        }
-        #endregion
-        #region " SendToSelf "
-        public void SendToSelf(string @event)
-        {
-            SendToSelf("event", @event);
-        }
-
-        public void SendToSelf(string type, object @event)
-        {
-            Caller
-            .receiveEvent(JsonConvert.SerializeObject(
-                new {
-                    Type = type,
-                    Event = @event
-                }));
-        }
-
-        public void SendToSelf(object @event)
-        {
-            if (Utilities.IsAnonymousType(@event.GetType())) {
-                throw new InvalidOperationException(
-                    "Anonymous types are not supported. Use Send(string, object) instead.");
-            }
-
-            string type = @event.GetType().Name;
-            SendToSelf(type, @event);
+            SendTo(target, type, @event);
         }
         #endregion
 
@@ -98,19 +125,20 @@ namespace SignalR
 
             //use dependency injection to find if user is authorized
             var authorize = Infrastructure.DependencyResolver.Resolve<IStreamAuthorize>();
-            if (authorize == null) {
-                return false;
+            if (authorize != null) {
+
+                string userId = Context.ClientId;
+                if (authorize.Authorized(ref userId, Context.User, authorizeFor)) {
+                    //validate user id
+                    //string id = Context.ClientId == "null" ? null : Context.ClientId;
+                    if (userId == null) userId = Context.ClientId;
+
+                    ConnectionManager.AddConnection(Context.ClientId, userId);
+
+                    AddToGroup(authorizeFor);
+                    return true;
+                }
             }
-
-            if (authorize.Authorized((string)Caller.ClientId, Context.User, authorizeFor)) {
-
-                //validate user id
-                //string id = Context.ClientId == "null" ? null : Context.ClientId;
-                AddToGroup(authorizeFor);
-                return true;
-
-            }
-
             return false;
         }
 
@@ -129,5 +157,14 @@ namespace SignalR
             }
         }
 
+        public void Disconnect()
+        {
+            DisconnectClient(Context.ClientId);
+        }
+
+        private void DisconnectClient(string clientId)
+        {
+            ConnectionManager.RemoveUser(clientId);
+        }
     }
 }

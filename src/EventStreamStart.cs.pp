@@ -22,7 +22,7 @@ namespace $rootnamespace$.App_Start {
             /// <param name="user">HttpContext User for the request</param>
             /// <param name="group">What group they're attempting to connect to</param>
             /// <returns>Returns whether or not the user is authorized</returns>
-            public bool Authorized(string clientId, IPrincipal user, string @group)
+            public bool Authorized(ref string clientId, IPrincipal user, string @group)
             {
                 return true;
             }

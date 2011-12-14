@@ -6,52 +6,52 @@ anything really. SignalR from David Fowler and Damian Edwards has made
 that nice and easy.
 
 
-Usage
------
-Here's a sample on how to use EventStream to send events to authorized users.
+Page specific streams
+---------------------
+If you'd like to update a specific page (for any connected client) such as adding new comments or updating a view count. This utilizes the path information from the url to determine the group this connection belongs to.
 
-    public class HomeController 
-	{
+    <script type="text/javascript">
+        $(function () {
+            var stream = new PageStream().connect();
+            //this would be the same as calling
+            // var stream = new EventStream(window.location.pathname).connect();
 
-		public IEventStream eventStream;
+            stream.eventReceived = function (type, data) {
+                var li = $("<li>");
+                li.html(data.Message);
+                li.appendTo("#messages");
+            };
+        });
+    </script>
+    <ul id="messages"></ul>
 
-		//Dependency Injection
-		public HomeController(IEventStream stream) 
-		{
-			eventStream = stream;
-		}
+You can then send a message to anyone subscribed to this page via the route path.
 
-		//No Dependency Injection
-		public HomeController() : this(new EventStream())
-		{
-		}
+    new EventStream().SendTo("/home/index", "status-update", new { Message = "some message" });
 
-		public ActionResult Login() 
-		{
-			stream.Send("User has logged in.");
 
-			return View();
-		}
+Group specific streams
+----------------------
+Similar to above however instead of using PageStream() you would use EventStream(groupName).
 
-		public ActionResult Purchase() 
-		{
-			stream.Send(new PurchaseObject { 
-				Name = "Some product",
-				Price = 99.99,
-				Quantity = 23
-			});
+    <script type="text/javascript">
+        $(function () {
+            var stream = new EventStream("messages").connect();
+            //this would be the same as calling
+            // var stream = new EventStream(window.location.pathname).connect();
 
-			return View();
-		}
+            stream.eventReceived = function (type, data) {
+                var li = $("<li>");
+                li.html(data.Message);
+                li.appendTo("#messages");
+            };
+        });
+    </script>
+    <ul id="messages"></ul>
 
-		public ActionResult StreamAnonymous() 
-		{
-			stream.Send("error", new {
-				Error = "This is an error - or something",
-				Description = "Someone has attempted to stream an anonymous object",
-				Details = "This is ok, but for anonymous objects you must pass a 'type'"
-			});				
 
-			return View();
-		}
-	}
+You can then send a message to anyone subscribed to this page via the route path.
+
+    new EventStream().SendTo("messages", "status-update", new { Message = "some message" });
+
+

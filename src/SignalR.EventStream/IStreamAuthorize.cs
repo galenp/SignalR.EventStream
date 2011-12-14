@@ -4,6 +4,6 @@ namespace SignalR
 {
     public interface IStreamAuthorize
     {
-        bool Authorized(string clientId, IPrincipal user, string group);
+        bool Authorized(ref string clientId, IPrincipal user, string group);
     }
 }

@@ -55,3 +55,6 @@ Nuget.Server*
 NuGist.Mvc/App_Data/error*
 nuget*/
 *.nupkg
+
+#This project specific
+*buildnupkg.cmd
