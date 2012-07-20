@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalR.EventStream", "SignalR.EventStream\SignalR.EventStream.csproj", "{E3367FFB-A24A-4850-98C3-874CD50EDF47}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{D376D160-E96F-4B27-9CBC-AD4049836FA3}"
@@ -10,10 +10,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{D376D160
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PackageFiles", "PackageFiles", "{6095ECEF-7770-4F3D-BF5A-49E3AAD8AFEB}"
 	ProjectSection(SolutionItems) = preProject
-		EventStreamStart.cs.pp = EventStreamStart.cs.pp
 		..\README.md = ..\README.md
+		EventStreamStart.cs.pp = EventStreamStart.cs.pp
 		signalR.eventStream.js = signalR.eventStream.js
 		signalR.eventStream.min.js = signalR.eventStream.min.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C9AE38A0-E59F-4BE5-B997-59A3E659D162}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
 Global

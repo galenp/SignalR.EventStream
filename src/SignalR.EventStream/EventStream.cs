@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
 using SignalR.Hubs;
@@ -96,9 +97,10 @@ namespace SignalR
                 destinations = new[] {target};
             }
 
-            foreach (var destination in destinations) {
-                GetClients<EventStream>()[destination]
-                    .receiveEvent(JsonConvert.SerializeObject(
+            var context = GlobalHost.ConnectionManager.GetHubContext<EventStream>();
+            foreach (var destination in destinations)
+            {
+                context.Clients[destination].receiveEvent(JsonConvert.SerializeObject(
                         new {
                             Type = type,
                             Event = @event
@@ -132,18 +134,18 @@ namespace SignalR
         {
 
             //use dependency injection to find if user is authorized
-            var authorize = Infrastructure.DependencyResolver.Resolve<IStreamAuthorize>();
+            var authorize = GlobalHost.DependencyResolver.Resolve<IStreamAuthorize>();
+            var context = GlobalHost.ConnectionManager.GetHubContext<EventStream>();
             if (authorize != null) {
 
-                string userId = Context.ClientId;
+                string userId = Context.ConnectionId;
                 if (authorize.Authorized(ref userId, Context.User, authorizeFor)) {
                     //validate user id
                     //string id = Context.ClientId == "null" ? null : Context.ClientId;
-                    if (userId == null) userId = Context.ClientId;
+                    if (userId == null) userId = Context.ConnectionId;
 
-                    ConnectionManager.AddConnection(Context.ClientId, userId);
-
-                    AddToGroup(authorizeFor);
+                    ConnectionManager.AddConnection(Context.ConnectionId, userId);
+                    context.Groups.Add(userId, authorizeFor);
                     return true;
                 }
             }
@@ -165,9 +167,10 @@ namespace SignalR
             }
         }
 
-        public void Disconnect()
+        public Task Disconnect()
         {
-            DisconnectClient(Context.ClientId);
+            DisconnectClient(Context.ConnectionId);
+            return null;
         }
 
         private void DisconnectClient(string clientId)
