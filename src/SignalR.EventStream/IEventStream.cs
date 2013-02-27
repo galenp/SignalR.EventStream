@@ -1,4 +1,4 @@
-﻿namespace SignalR
+﻿namespace Microsoft.AspNet.SignalR
 {
     public interface IEventStream
     {

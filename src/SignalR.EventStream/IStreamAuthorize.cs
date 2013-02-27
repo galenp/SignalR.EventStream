@@ -1,6 +1,6 @@
 using System.Security.Principal;
 
-namespace SignalR
+namespace Microsoft.AspNet.SignalR
 {
     public interface IStreamAuthorize
     {

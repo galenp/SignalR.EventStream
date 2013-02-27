@@ -1,12 +1,12 @@
 using System.Security.Principal;
-using SignalR;
+using Microsoft.AspNet.SignalR;
 
 [assembly: WebActivator.PreApplicationStartMethod(typeof($rootnamespace$.App_Start.EventStreamStart), "Start")]
 
 namespace $rootnamespace$.App_Start {
     public static class EventStreamStart {
         public static void Start() {
-			SignalR.Infrastructure.DependencyResolver.Register(typeof (IStreamAuthorize), () => new SignalRAuthorize());
+			GlobalHost.DependencyResolver.Register(typeof (IStreamAuthorize), () => new SignalRAuthorize());
         }
 		
         /// <summary>

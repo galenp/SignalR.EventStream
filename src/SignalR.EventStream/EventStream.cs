@@ -3,10 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 
-namespace SignalR
+namespace Microsoft.AspNet.SignalR
 {
     internal class EventStreamConnectionManager
     {
