@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
-using System.Web;
+using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
-using SignalR.Hubs;
 
 namespace SignalR
 {
@@ -57,11 +54,12 @@ namespace SignalR
         }
     }
 
-    public class EventStream : Hub, IEventStream, IDisconnect
+    public class EventStream  : Hub, IEventStream
     {
         private static readonly EventStreamConnectionManager ConnectionManager;
         static EventStream()
         {
+            
             ConnectionManager = new EventStreamConnectionManager();
         }
 
@@ -100,7 +98,7 @@ namespace SignalR
             var context = GlobalHost.ConnectionManager.GetHubContext<EventStream>();
             foreach (var destination in destinations)
             {
-                context.Clients[destination].receiveEvent(JsonConvert.SerializeObject(
+                context.Clients.All[destination].receiveEvent(JsonConvert.SerializeObject(
                         new {
                             Type = type,
                             Event = @event

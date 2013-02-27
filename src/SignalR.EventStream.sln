@@ -10,16 +10,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{D376D160
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PackageFiles", "PackageFiles", "{6095ECEF-7770-4F3D-BF5A-49E3AAD8AFEB}"
 	ProjectSection(SolutionItems) = preProject
-		..\README.md = ..\README.md
 		EventStreamStart.cs.pp = EventStreamStart.cs.pp
+		..\README.md = ..\README.md
 		signalR.eventStream.js = signalR.eventStream.js
 		signalR.eventStream.min.js = signalR.eventStream.min.js
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C9AE38A0-E59F-4BE5-B997-59A3E659D162}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
