@@ -8,13 +8,13 @@ function EventStream(authorizeFor) {
         if (!this.initialized) {
             var stream = $.connection.eventStream;
             var parent = this;
-            stream.receiveEvent = function (event) {
+            stream.client.receiveEvent = function (event) {
                 var result = $.parseJSON(event);
                 parent.eventReceived(result.Type, result.Event);
             };
 
             $.connection.hub.start({}, function () {
-                stream.authorize(parent.authorizeFor)
+                stream.server.authorize(parent.authorizeFor)
                     .fail(function (e) {
                         $.connection.hub.stop();
                         parent.connectionFailed(e);

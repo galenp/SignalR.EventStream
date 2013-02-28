@@ -13,7 +13,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PackageFiles", "PackageFile
 		EventStreamStart.cs.pp = EventStreamStart.cs.pp
 		..\README.md = ..\README.md
 		signalR.eventStream.js = signalR.eventStream.js
-		signalR.eventStream.min.js = signalR.eventStream.min.js
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C9AE38A0-E59F-4BE5-B997-59A3E659D162}"

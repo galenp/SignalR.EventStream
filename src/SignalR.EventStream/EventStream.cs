@@ -97,7 +97,7 @@ namespace Microsoft.AspNet.SignalR
             var context = GlobalHost.ConnectionManager.GetHubContext<EventStream>();
             foreach (var destination in destinations)
             {
-                context.Clients.All[destination].receiveEvent(JsonConvert.SerializeObject(
+                context.Clients.Group(destination).receiveEvent(JsonConvert.SerializeObject(
                         new {
                             Type = type,
                             Event = @event
